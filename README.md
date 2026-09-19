@@ -12,6 +12,13 @@ A ideia central é substituir as rondas manuais improdutivas por um monitorament
 
 Facilitar o registro de resíduos eletrônicos, evitar o descarte de itens perigosos ou patrimoniados na lixeira comum, e fornecer alertas automatizados de capacidade para a Coordenadoria de Infraestrutura (CINFRA).
 
+## Público-alvo
+
+### Comunidade acadêmica
+
+Alunos e servidores do IFPE podem utilizar o sistema para registrar o descarte de resíduos eletrônicos de forma rápida e organizada.
+
+
 ## Equipe
 
 - Eliabe Rafael
