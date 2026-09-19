@@ -1,4 +1,4 @@
-**Projeto:** Gestão Inteligente de Lixo Eletrônico · **Equipe:** Eduardo Artur, Eliabe Rafael, Erik Jerônimo, Joseildo dos Santos e Luis Felipe · **Data:** 2026-09-19
+**Projeto:** Gestão Inteligente de Lixo Eletrônico · **Equipe:** Eliabe Rafael, Erik Jerônimo, Joseildo dos Santos e Luis Felipe · **Data:** 2026-09-19
 **Organização parceira:** IFPE Campus Palmares
 
 ---
