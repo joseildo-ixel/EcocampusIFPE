@@ -15,7 +15,7 @@ Facilitar o registro de resíduos eletrônicos, evitar o descarte de itens perig
 ## Equipe
 
 - Eliabe Rafael
-- Erik Jeronimo
+- Erik Jerônimo
 - Joseildo dos Santos
 - Luis Felipe
 
