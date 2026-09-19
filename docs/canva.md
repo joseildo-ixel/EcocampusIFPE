@@ -9,8 +9,8 @@ No IFPE Campus Palmares, a Coordenadoria de Infraestrutura (CINFRA) precisa gere
 
 **Evidências de que o problema existe** (dados, falas, observação):
 
--O Técnico Administrativo responsável pela CINFRA confirmou que o monitoramento atual é estritamente manual, onde "alguém passa periodicamente para olhar".
--A pesquisa institucional revelou que a "Falta de métricas de volume" é o principal problema enfrentado pela gestão da lixeira hoje.
+* O Técnico Administrativo responsável pela CINFRA confirmou que o monitoramento atual é estritamente manual, onde "alguém passa periodicamente para olhar".
+* A pesquisa institucional revelou que a "Falta de métricas de volume" é o principal problema enfrentado pela gestão da lixeira hoje.
 
 ## 2. Quem é afetado
 
