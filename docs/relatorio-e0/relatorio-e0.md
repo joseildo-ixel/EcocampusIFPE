@@ -26,16 +26,14 @@ Este relatório registra as atividades práticas sobre o protocolo HTTP: inspeç
 
 | Item | Observação registrada |
 |---|---|
-| Total de requisições da primeira página | Preencher com o número exibido no DevTools após executar a prática. |
-| Método e status do documento | Normalmente `GET` e `200 OK`; confirmar na requisição `document`. |
-| `Content-Type` da resposta principal | Normalmente `text/html; charset=utf-8`; confirmar em **Headers**. |
+| Total de requisições da primeira página | **1 requisição** (site testado: `http://localhost:8000/`). |
+| Método e status do documento | `GET` e `200 OK`, confirmado na requisição `document`. |
+| `Content-Type` da resposta principal | `text/html; charset=utf-8`, confirmado em **Headers → Response headers**. |
 | Requisição que enviaria um descarte | `POST /api/descartes`, com JSON ou `multipart/form-data`. |
 | Cabeçalho de autenticação da área da CINFRA | `Authorization: Bearer ...` ou `Cookie: sessionid=...`, conforme a aplicação. |
-| Cache ou resposta `304` | Registrar se ocorreu. `304 Not Modified` indica que o cliente pode usar a cópia em cache. |
+| Cache ou resposta `304` | Não ocorreu nesta captura (recarregamento após limpar cache/log). O servidor devolveu `Set-Cookie: visitas=2; Path=/; HttpOnly; SameSite=Lax`, indicando que a aplicação mantém contagem de visitas via cookie. |
 
 **Captura do DevTools:**
-
->**Captura do DevTools:**
 
 ![Captura da aba Network](./captura-devtools.jpg)
 
@@ -202,12 +200,134 @@ curl -i -X POST http://localhost:8000/recados/0/excluir
 
 ### Respostas aos seis experimentos
 
-1. **Formulário GET e F5:** a rota `/recado` exibe o formulário usando `GET`. O nome/texto aparece como campo do formulário, e o F5 apenas repete a leitura da página; não há operação de gravação.
-2. **Enviar recado e pressionar F5:** o envio usa `POST /recado`. O servidor adiciona o recado e responde com `303 See Other` e `Location` para uma rota `GET`. Ao pressionar F5, o navegador repete o `GET`, não o `POST`, portanto o recado não duplica.
-3. **Remover o redirecionamento:** se o `POST` responder diretamente com `200 OK`, o navegador ficará em uma resposta originada por POST. Ao pressionar F5, ele poderá perguntar se deve reenviar os dados; confirmando, a operação será executada novamente. Esse é o problema resolvido pelo padrão PRG — **Post/Redirect/Get**.
-4. **Acessar `/qualquer-coisa`:** a resposta é `404 Not Found`. O status é definido no último bloco de tratamento de rotas do servidor, que chama `res.writeHead(404, ...)`.
-5. **Acessar `/recado`:** a resposta é `200 OK`, porque a rota GET foi criada para exibir o formulário de novo recado.
-6. **Comparação com NestJS:** no servidor mínimo, o código compara método e caminho para fazer o roteamento, usa `new URL()` para ler a URL/query string e chama `res.writeHead()`/`res.end()` para montar a resposta. No NestJS, decorators, controllers, pipes e adapters assumem essas responsabilidades.
+> **Nota:** o servidor mínimo implementado (`servidor-minimo.mjs`) não possui uma rota de formulário `/recado` para criação de recados. As rotas existentes são `GET /`, `GET /obras`, `POST /eco`, `GET /recados/:id` e `POST /recados/:id/excluir`. As respostas abaixo foram adaptadas para refletir o comportamento real do código, confirmado experimentalmente com `curl`.
+
+1. **GET /recados/0 e F5:** a rota `GET /recados/:id` apenas lê e devolve um recado existente. Pressionar F5 repete a mesma leitura, sem qualquer efeito colateral no servidor — é uma operação idempotente e segura de repetir quantas vezes for necessário.
+2. **POST /eco e pressionar F5:** essa rota recebe um JSON e devolve o mesmo conteúdo como eco, respondendo diretamente com `200 OK` — **sem** redirecionamento. Isso significa que, se essa requisição fosse feita a partir de um formulário no navegador (em vez de via `curl`), o navegador ficaria "parado" numa resposta originada por `POST`. Ao pressionar F5 nessa situação, ele exibiria um aviso perguntando se os dados devem ser reenviados; confirmando, a operação seria executada de novo.
+3. **Comparando com a exclusão de recado:** a rota `POST /recados/:id/excluir` resolve exatamente o problema do item anterior: em vez de responder `200 OK` diretamente, ela responde `303 See Other` com um cabeçalho `Location` apontando para uma rota `GET`. O navegador então refaz automaticamente um `GET` para essa URL, e um F5 subsequente repete apenas a leitura — não a exclusão. Esse é o padrão **PRG (Post/Redirect/Get)**, presente na rota de exclusão mas ausente na rota `/eco`.
+4. **Acessar `/qualquer-coisa`:** a resposta é `404 Not Found`, com corpo `"404 — rota não encontrada"`. Esse status é definido no bloco final do servidor, que trata qualquer combinação de método/caminho não reconhecida anteriormente, chamando `res.writeHead(404, ...)`.
+5. **Acessar `/recado` (singular):** diferentemente do que o roteiro original sugeria, essa rota **não existe** no servidor implementado — a resposta real é `404 Not Found`, e não `200 OK`. Isso foi confirmado experimentalmente (ver evidências abaixo) e reflete a ausência de um formulário de criação de recados nesta versão do servidor.
+6. **Comparação com NestJS:** no servidor mínimo, o código compara manualmente `req.method` e `url.pathname` para decidir qual bloco de tratamento executar, usa `new URL()` para interpretar a URL e a query string, e chama `res.writeHead()` / `res.end()` para montar a resposta byte a byte. No NestJS, essas responsabilidades são assumidas por decorators (`@Get()`, `@Post()`), controllers, pipes de validação e adapters HTTP, que abstraem o roteamento manual e o parsing de requisição/resposta.
+
+### Evidências reais dos testes com `curl`
+
+**1. `GET /` — página inicial e cookie de visitas**
+
+```
+PS C:\Users\lucas> curl.exe -i http://localhost:8000/
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Set-Cookie: visitas=1; Path=/; HttpOnly; SameSite=Lax
+X-Content-Type-Options: nosniff
+Date: Sun, 20 Sep 2026 17:51:07 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+      <h1>Servidor mínimo</h1>
+      <p>esta é sua 1ª visita</p>
+      <ul>
+        <li><a href="/obras">/obras</a></li>
+        <li><a href="/recados/0">/recados/0</a></li>
+        <li><a href="/recados/1">/recados/1</a></li>
+      </ul>
+```
+
+**2. `GET /recados/0` — recado existente**
+
+```
+PS C:\Users\lucas> curl.exe -i http://localhost:8000/recados/0
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Sun, 20 Sep 2026 17:51:40 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+<h1>Recado 0</h1><p>Primeiro recado: visite o EcoCampusIFPE.</p>
+```
+
+**3. `GET /recados/99` — recado inexistente (404)**
+
+```
+PS C:\Users\lucas> curl.exe -i http://localhost:8000/recados/99
+HTTP/1.1 404 Not Found
+Content-Type: text/plain; charset=utf-8
+Date: Sun, 20 Sep 2026 17:52:05 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+Recado não existe
+```
+
+**4. `POST /eco` — envio e eco de JSON**
+
+```
+PS C:\Users\lucas> [System.IO.File]::WriteAllText("body.json", '{"texto":"Recado de teste"}')
+PS C:\Users\lucas> curl.exe -i -X POST http://localhost:8000/eco -H "Content-Type: application/json" --data-binary "@body.json"
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Sun, 20 Sep 2026 18:02:42 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+{
+  "recebido": {
+    "texto": "Recado de teste"
+  },
+  "ok": true
+}
+```
+
+*Observação técnica: o primeiro envio do JSON via `-d` no PowerShell falhou com `"erro": "JSON inválido"`, mesmo usando aspas simples, porque `Out-File -Encoding utf8` insere um BOM (marcador de encoding) no início do arquivo, quebrando o `JSON.parse()` do Node. A solução foi gravar o arquivo com `[System.IO.File]::WriteAllText()`, que não adiciona BOM.*
+
+**5. Cookies e contador de visitas persistente**
+
+```
+PS C:\Users\lucas> curl.exe -i -c cookies.txt -b cookies.txt http://localhost:8000/
+HTTP/1.1 200 OK
+Set-Cookie: visitas=1; Path=/; HttpOnly; SameSite=Lax
+...
+<p>esta é sua 1ª visita</p>
+
+PS C:\Users\lucas> curl.exe -i -c cookies.txt -b cookies.txt http://localhost:8000/
+HTTP/1.1 200 OK
+Set-Cookie: visitas=2; Path=/; HttpOnly; SameSite=Lax
+...
+<p>esta é sua 2ª visita</p>
+```
+
+A segunda execução reenvia o cookie salvo pela primeira (`-b cookies.txt`), e o servidor incrementa o contador de `1` para `2` — evidência de que o cookie mantém estado entre requisições independentes, já que o protocolo HTTP em si não tem memória.
+
+**6. `POST /recados/0/excluir` — exclusão e efeito no array**
+
+```
+PS C:\Users\lucas> curl.exe -i -X POST http://localhost:8000/recados/0/excluir
+HTTP/1.1 303 See Other
+Location: /recados/0
+X-Content-Type-Options: nosniff
+Date: Sun, 20 Sep 2026 18:04:26 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+PS C:\Users\lucas> curl.exe -i http://localhost:8000/recados/0
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Sun, 20 Sep 2026 18:04:39 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+
+<h1>Recado 0</h1><p>Segundo recado: o HTTP é a interface do sistema.</p>
+```
+
+A exclusão retorna `303 See Other` com `Location: /recados/0` (padrão PRG). Como o servidor usa `Array.splice()`, o recado que antes ocupava o índice 1 ("Segundo recado...") passa a ocupar o índice 0 — confirmando que a exclusão de fato removeu o item anterior do array.
 
 ### Cookies e visitas
 
@@ -258,8 +378,6 @@ A característica do HTTP que mais influencia a construção do EcoCampusIFPE é
 - [x] Servidor mínimo presente no repositório.
 - [x] Rotas de recados, exclusão, cookie e escape HTML documentadas.
 - [x] PRG e prevenção de duplicidade explicados.
-- [ ] Inserir captura real do DevTools.
-- [ ] Inserir saídas reais de pelo menos cinco comandos `curl`.
-- [ ] Confirmar os valores observados na tabela após executar a prática.
-
-As três últimas caixas precisam ser marcadas somente depois de executar os testes e anexar as evidências.
+- [x] Inserir captura real do DevTools.
+- [x] Inserir saídas reais de pelo menos cinco comandos `curl` da Prática 2 (httpbin.org).
+- [x] Confirmar os valores observados na tabela após executar a prática.
