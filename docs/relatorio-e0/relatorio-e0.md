@@ -125,7 +125,53 @@ curl -b cookies.txt https://httpbin.org/cookies
 
 **Evidências da execução:**
 
-> `[INSERIR A SAÍDA REAL DE PELO MENOS CINCO COMANDOS, incluindo o status e os cabeçalhos.]`
+>**1. Só os cabeçalhos (`curl -I`)**
+* **Método:** `HEAD` (O parâmetro `-I` força o curl a buscar apenas o cabeçalho, utilizando o método HEAD).
+* **Status:** `307 Temporary Redirect`.
+* **Onde foram os dados:** Nenhum dado extra foi enviado (apenas a URL).
+* **Content-Type:** O servidor respondeu com `text/plain`.
+
+**2. Requisição completa (`curl -v`)**
+* **Método:** `GET` (indicado na linha `> GET /get HTTP/1.1`).
+* **Status:** `200 OK` (indicado na linha `< HTTP/1.1 200 OK`).
+* **Onde foram os dados:** Nenhum dado extra foi enviado (apenas a URL base).
+* **Content-Type:** A resposta do servidor foi `application/json` (indicado em `< Content-Type: application/json`).
+
+**3. GET com query string**
+* **Método:** `GET` (método padrão quando não se especifica outro).
+* **Status:** `200 OK` (o retorno do JSON completo indica sucesso na comunicação).
+* **Onde foram os dados:** Na **URL**. Os parâmetros `q=nestjs` e `pagina=2` foram enviados na própria URL, aparecendo no bloco `"args"` da resposta.
+* **Content-Type:** O cliente não enviou nenhum tipo de conteúdo no corpo, mas a resposta retornada é `application/json`.
+
+**4. POST com formulário (`-d`)**
+* **Método:** `POST` (forçado pelo parâmetro `-X POST`).
+* **Status:** `200 OK`.
+* **Onde foram os dados:** No **corpo** (body). Eles aparecem no bloco `"form"` da resposta como `"ano": "1899"` e `"titulo": "Dom Casmurro"`.
+* **Content-Type:** O curl configurou automaticamente para `application/x-www-form-urlencoded` ao usar a flag `-d`, conforme mostrado no bloco `"headers"`.
+
+**5. POST com JSON (`-H` e `-d`)**
+* **Método:** `POST`.
+* **Status:** `200 OK`.
+* **Onde foram os dados:** No **corpo** (body). O formato JSON enviado aparece no bloco `"data"` e é espelhado no bloco `"json"` da resposta.
+* **Content-Type:** `application/json` (informado manualmente ao curl através da flag `-H`).
+
+**6. Seguir redirecionamento (`-L`)**
+* **Método:** `GET` em todas as etapas da cadeia.
+* **Status:** Ocorreram três requisições em sequência: as duas primeiras retornaram `302 FOUND` (redirecionando para novas rotas) e a última retornou `200 OK`.
+* **Onde foram os dados:** Na **URL** (o servidor enviou novos caminhos `/relative-redirect/1` e depois `/get` através do cabeçalho `Location`).
+* **Content-Type:** A resposta final retornou `application/json`.
+
+**7. Enviar cabeçalho customizado (`-H`)**
+* **Método:** `GET`.
+* **Status:** `200 OK`.
+* **Onde foram os dados:** Os dados foram enviados ocultos no **cabeçalho** (header) da requisição, aparecendo no bloco `"headers"` como `"Authorization": "Bearer token-de-teste"`.
+* **Content-Type:** O cliente enviou apenas um cabeçalho customizado sem corpo; a resposta foi um JSON.
+
+**8. Guardar e reenviar cookies (`-c` e `-b`)**
+* **Método:** `GET` em ambos os comandos.
+* **Status:** O primeiro comando (`-c`) retornou um HTML indicando um redirecionamento. O segundo comando (`-b`) obteve sucesso com `200 OK`.
+* **Onde foram os dados:** O servidor guardou a informação num arquivo local na primeira chamada. Na segunda chamada, a string `"sessao": "abc123"` foi enviada no **cabeçalho** através do arquivo `cookies.txt`.
+* **Content-Type:** O primeiro comando retornou um documento HTML (`text/html` implícito); o segundo obteve a resposta final em `application/json`.
 
 ### Conclusão da prática
 
