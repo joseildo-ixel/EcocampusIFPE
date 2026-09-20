@@ -35,7 +35,9 @@ Este relatório registra as atividades práticas sobre o protocolo HTTP: inspeç
 
 **Captura do DevTools:**
 
-> `[INSERIR AQUI O PRINT DO NETWORK, mostrando a requisição document, Fetch/XHR e os headers da resposta.]`
+>**Captura do DevTools:**
+
+![Captura da aba Network](./captura-devtools.jpg)
 
 ### Análise
 
