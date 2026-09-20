@@ -35,7 +35,7 @@ Este relatório registra as atividades práticas sobre o protocolo HTTP: inspeç
 
 **Captura do DevTools:**
 
-![Captura da aba Network](./captura-devtools.jpg)
+![Captura da aba Network](./captura.jpg)
 
 ### Análise
 
