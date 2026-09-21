@@ -1,6 +1,5 @@
 # E0 — Relatório de inspeção HTTP
 
-> **Aluno:** Joseildo Ixel  
 > **Projeto:** EcoCampusIFPE  
 > **Módulo:** M01 — Fundamentos da Web e HTTP
 
