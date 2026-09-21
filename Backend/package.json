@@ -14,6 +14,7 @@
   "dependencies": {
     "@nestjs/common": "^12.0.4",
     "@nestjs/core": "^12.0.4",
+    "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^12.0.4",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
