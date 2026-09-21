@@ -18,6 +18,9 @@ Facilitar o registro de resíduos eletrônicos, evitar o descarte de itens perig
 
 Alunos e servidores do IFPE podem utilizar o sistema para registrar o descarte de resíduos eletrônicos de forma rápida e organizada.
 
+### Comunidade Maker e projetos acadêmicos
+
+Projetos e integrantes da comunidade Maker podem consultar os itens disponíveis para reaproveitamento e identificar componentes que ainda possam ser utilizados em novos projetos.
 
 ## Equipe
 
