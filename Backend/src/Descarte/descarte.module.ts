@@ -5,7 +5,6 @@ import { DescarteService } from './descarte.service';
 import { Descarte } from './entities/descarte.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Descarte])],
   controllers: [DescarteController],
   providers: [DescarteService],
 })

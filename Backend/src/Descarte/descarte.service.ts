@@ -1,35 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Descarte } from './entities/descarte.entity';
-import { CreateDescarteDto } from './dto/create-descarte.dto';
-import { UpdateDescarteDto } from './dto/update-descarte.dto';
 
 @Injectable()
 export class DescarteService {
-  constructor(
-    @InjectRepository(Descarte)
-    private descarteRepository: Repository<Descarte>,
-  ) {}
+  constructor() {}
 
-  create(dto: CreateDescarteDto) {
-    const descarte = this.descarteRepository.create(dto);
-    return this.descarteRepository.save(descarte);
+  create(dto: any) {
+    return 'Esta ação simula a criação de um novo descarte.';
   }
 
   findAll() {
-    return this.descarteRepository.find();
+    return 'Esta ação simula a devolução de todos os descartes.';
   }
 
   findOne(id: number) {
-    return this.descarteRepository.findOneBy({ id });
+    return `Esta ação simula a procura do descarte #${id}.`;
   }
 
-  update(id: number, dto: UpdateDescarteDto) {
-    return this.descarteRepository.update(id, dto);
+  update(id: number, dto: any) {
+    return `Esta ação simula a atualização do descarte #${id}.`;
   }
 
   remove(id: number) {
-    return this.descarteRepository.delete(id);
+    return `Esta ação simula a remoção do descarte #${id}.`;
   }
 }

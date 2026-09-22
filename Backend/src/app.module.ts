@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ObjetosModule } from './objetos/objetos.module';
 import { ColetorModule } from './coletor/coletor.module';
-import { UsuariosModule } from './usuarios/usuarios.module';
+import { UsuariosModule } from './usuario/usuarios.module';
 import { DescarteModule } from './Descarte/descarte.module';
 
 @Module({
