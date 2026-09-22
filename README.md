@@ -13,14 +13,7 @@ A ideia central é substituir as rondas manuais improdutivas por um monitorament
 Facilitar o registro de resíduos eletrônicos, evitar o descarte de itens perigosos ou patrimoniados na lixeira comum, e fornecer alertas automatizados de capacidade para a Coordenadoria de Infraestrutura (CINFRA).
 
 ## Público-alvo
-
-### Comunidade acadêmica
-
-Alunos e servidores do IFPE podem utilizar o sistema para registrar o descarte de resíduos eletrônicos de forma rápida e organizada.
-
-### Comunidade Maker e projetos acadêmicos
-
-Projetos e integrantes da comunidade Maker podem consultar os itens disponíveis para reaproveitamento e identificar componentes que ainda possam ser utilizados em novos projetos.
+O sistema atende a toda a comunidade do IFPE (alunos e servidores), bem como visitantes e público externo durante eventos no campus. Além de viabilizar o descarte correto de resíduos eletrônicos, a plataforma permite que componentes funcionais sejam mapeados e reaproveitados em novos projetos acadêmicos, de inovação e cultura maker.
 
 ## Equipe
 
@@ -44,18 +37,30 @@ Projetos e integrantes da comunidade Maker podem consultar os itens disponíveis
 - Banco de dados: PostgreSQL
 - Hospedagem: PaaS gratuita
 
-## Estrutura do repositório
+## Como rodar o projeto localmente
 
-```text
-EcoCampusIFPE/
-├── README.md
-├── .gitignore
-├── docs/
-│   ├── canva.md
-│   └── roadmap.md
-├── backend/
-│   └── README.md
-├── frontend/
-│   └── README.md
-└── .github/
-    └── workflows/
+1. Navegue até a pasta do backend: `cd Backend`
+2. Instale as dependências: `npm install`
+3. Inicie o servidor: `npm run start:dev`
+
+## Exemplos de Uso (Testando o CRUD via CLI)
+
+Após iniciar o servidor, você pode testar as rotas em um novo terminal:
+
+**Listar todos os Usuários:**
+> curl -X GET http://localhost:3000/usuarios
+
+**Listar todos os Descartes registrados:**
+> curl -X GET http://localhost:3000/descarte
+
+**Listar todas as Coletas agendadas/realizadas:**
+> curl -X GET http://localhost:3000/coleta
+
+**Listar Objetos (Catálogo Maker):**
+> curl -X GET http://localhost:3000/objetos
+
+**Criar um novo coletor:**
+> curl -X POST http://localhost:3000/api/coletor
+
+**Zerar o volume do coletor (Reset):**
+> curl -X POST http://localhost:3000/api/coletor/1/reset
