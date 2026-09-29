@@ -16,4 +16,10 @@ export class Descarte {
 
   @CreateDateColumn()
   criadoEm: Date;
+
+  @Column()
+  usuarioId: number;
+
+  @Column()
+  coletorId: number;
 }

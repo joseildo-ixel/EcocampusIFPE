@@ -10,4 +10,7 @@ export class Coleta {
 
   @Column()
   quantidade: number;
+
+  @Column()
+  coletorId: number;
 }
