@@ -4,10 +4,9 @@ import { AppService } from './app.service';
 import { ObjetosModule } from './objetos/objetos.module';
 import { ColetorModule } from './coletor/coletor.module';
 import { UsuariosModule } from './usuario/usuarios.module';
-import { DescarteModule } from './Descarte/descarte.module';
 
 @Module({
-  imports: [ObjetosModule, ColetorModule, UsuariosModule, DescarteModule],
+  imports: [ObjetosModule, ColetorModule, UsuariosModule],
   controllers: [AppController],
   providers: [AppService],
 })
