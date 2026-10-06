@@ -1,26 +1,42 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Descarte } from './entities/descarte.entity';
+import { CreateDescarteDto } from './dto/create-descarte.dto';
+import { UpdateDescarteDto } from './dto/update-descarte.dto';
 
 @Injectable()
 export class DescarteService {
-  constructor() {}
+  constructor(
+    @InjectRepository(Descarte)
+    private readonly descarteRepository: Repository<Descarte>,
+  ) {}
 
-  create(dto: any) {
-    return 'Esta ação simula a criação de um novo descarte.';
+  async create(createDescarteDto: CreateDescarteDto): Promise<Descarte> {
+    const novoDescarte = this.descarteRepository.create(createDescarteDto);
+    return await this.descarteRepository.save(novoDescarte);
   }
 
-  findAll() {
-    return 'Esta ação simula a devolução de todos os descartes.';
+  async findAll(): Promise<Descarte[]> {
+    return await this.descarteRepository.find();
   }
 
-  findOne(id: number) {
-    return `Esta ação simula a procura do descarte #${id}.`;
+  async findOne(id: string): Promise<Descarte> {
+    const descarte = await this.descarteRepository.findOneBy({ id });
+    if (!descarte) {
+      throw new NotFoundException(`Descarte com ID ${id} não foi encontrado.`);
+    }
+    return descarte;
   }
 
-  update(id: number, dto: any) {
-    return `Esta ação simula a atualização do descarte #${id}.`;
+  async update(id: string, updateDescarteDto: UpdateDescarteDto): Promise<Descarte> {
+    const descarte = await this.findOne(id);
+    this.descarteRepository.merge(descarte, updateDescarteDto);
+    return await this.descarteRepository.save(descarte);
   }
 
-  remove(id: number) {
-    return `Esta ação simula a remoção do descarte #${id}.`;
+  async remove(id: string): Promise<void> {
+    const descarte = await this.findOne(id);
+    await this.descarteRepository.remove(descarte);
   }
 }

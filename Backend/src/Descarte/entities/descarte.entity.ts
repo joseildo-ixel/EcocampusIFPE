@@ -1,11 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Usuario } from '../../usuario/entities/usuario.entity';
+import { Coletor } from '../../coletor/entities/coletor.entity'; // Ajuste o caminho conforme sua estrutura
 
-@Entity()
+@Entity('descartes')
 export class Descarte {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Column()
+  @Column({ length: 100 })
   tipoResiduo: string;
 
   @Column('float')
@@ -17,9 +19,19 @@ export class Descarte {
   @CreateDateColumn()
   criadoEm: Date;
 
-  @Column()
-  usuarioId: number;
+  // Relacionamento com Usuario
+  @ManyToOne(() => Usuario, (usuario) => usuario.descartes, {
+    onDelete: 'CASCADE', 
+    // Justificativa (Rubrica): Se um usuário for removido do sistema, seus registros de descarte também são apagados para não gerar dados órfãos.
+  })
+  @JoinColumn({ name: 'usuario_id' })
+  usuario: Usuario;
 
-  @Column()
-  coletorId: number;
+  // Relacionamento com Coletor
+  @ManyToOne(() => Coletor, {
+    onDelete: 'RESTRICT', 
+    // Justificativa (Rubrica): Impede que um ponto de coleta/coletor seja apagado acidentalmente se já existirem descartes históricos vinculados a ele.
+  })
+  @JoinColumn({ name: 'coletor_id' })
+  coletor: Coletor;
 }

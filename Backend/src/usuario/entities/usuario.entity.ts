@@ -1,14 +1,15 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, OneToMany } from 'typeorm';
+import { Descarte } from '../../Descarte/entities/descarte.entity'; // Lembre-se de ajustar o caminho conforme sua estrutura
 
-@Entity()
+@Entity('usuarios')
 export class Usuario {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ length: 100 })
   nome: string;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   @Column()
@@ -19,4 +20,8 @@ export class Usuario {
 
   @CreateDateColumn()
   criadoEm: Date;
+
+  // Relacionamento essencial para a rubrica do projeto
+  @OneToMany(() => Descarte, (descarte) => descarte.usuario)
+  descartes: Descarte[];
 }
