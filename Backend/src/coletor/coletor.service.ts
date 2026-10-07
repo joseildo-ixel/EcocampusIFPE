@@ -1,17 +1,45 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateColetorDto } from './dto/create-coletor.dto';
+import { Coletor } from './entities/coletor.entity';
 
 @Injectable()
 export class ColetorService {
+  constructor(
+    @InjectRepository(Coletor)
+    private readonly coletorRepository: Repository<Coletor>,
+  ) {}
+
   create(createColetorDto: CreateColetorDto) {
-    return 'Essa ação adiciona um novo coletor no banco de dados';
+    const coletor = this.coletorRepository.create(createColetorDto);
+
+    return this.coletorRepository.save(coletor);
   }
 
-  atualizarVolume(id: number, novoDescarte: number) {
-    return `Essa ação vai somar o descarte ao volumeAtual do coletor #${id} e checar o alerta de 80%`;
+  async atualizarVolume(id: number, novoDescarte: number) {
+    const coletor = await this.findOne(id);
+
+    coletor.volumeAtual += novoDescarte;
+
+    return this.coletorRepository.save(coletor);
   }
 
-  resetar(id: number) {
-    return `Essa ação zera o volume do coletor #${id} após a equipe fazer a coleta física`;
+  async resetar(id: number) {
+    const coletor = await this.findOne(id);
+
+    coletor.volumeAtual = 0;
+
+    return this.coletorRepository.save(coletor);
+  }
+
+  private async findOne(id: number) {
+    const coletor = await this.coletorRepository.findOneBy({ id });
+
+    if (!coletor) {
+      throw new NotFoundException('Coletor não encontrado');
+    }
+
+    return coletor;
   }
 }
