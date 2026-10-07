@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+} from 'typeorm';
+import { Coleta } from '../../coleta/entities/coleta.entity';
 
 @Entity()
 export class Coletor {
@@ -13,4 +19,7 @@ export class Coletor {
 
   @Column({ default: 0 })
   volumeAtual: number;
+
+  @OneToMany(() => Coleta, (coleta) => coleta.coletor)
+  coletas: Coleta[];
 }
