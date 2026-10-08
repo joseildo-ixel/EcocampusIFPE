@@ -1,7 +1,14 @@
 # E0 — Relatório de inspeção HTTP
 
+> **Aluno:** Joseildo Ixel  
 > **Projeto:** EcoCampusIFPE  
 > **Módulo:** M01 — Fundamentos da Web e HTTP
+
+## Objetivo
+
+Este relatório registra as atividades práticas sobre o protocolo HTTP: inspeção de requisições no DevTools, uso do `curl` e exploração de um servidor mínimo em Node.js. A análise relaciona método, URL, cabeçalhos, corpo, status e estado da aplicação.
+
+> **Nota sobre evidências:** os comandos abaixo estão prontos para execução. As linhas com `[inserir captura]` devem receber os prints feitos pelo aluno no navegador/terminal, pois a quantidade de requisições e os cabeçalhos podem variar conforme o site, o navegador e a rede.
 
 ---
 

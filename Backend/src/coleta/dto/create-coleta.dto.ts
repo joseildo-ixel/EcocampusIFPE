@@ -1,4 +1,4 @@
-import { IsDateString, IsNumber, Min } from 'class-validator';
+import { IsDateString, IsNumber, Min, IsNotEmpty } from 'class-validator';
 
 export class CreateColetaDto {
   @IsDateString()
@@ -7,4 +7,8 @@ export class CreateColetaDto {
   @IsNumber()
   @Min(0)
   quantidade: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  coletorId: number;
 }

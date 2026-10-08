@@ -1,4 +1,4 @@
-import {
+﻿import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
@@ -7,18 +7,20 @@ import {
 } from 'typeorm';
 import { Coletor } from '../../coletor/entities/coletor.entity';
 
-@Entity()
+@Entity('coletas')
 export class Coleta {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Column()
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   data: Date;
 
-  @Column()
+  @Column('float')
   quantidade: number;
 
-  @ManyToOne(() => Coletor, (coletor) => coletor.coletas)
+  @ManyToOne(() => Coletor, (coletor) => coletor.coletas, {
+    onDelete: 'RESTRICT',
+  })
   @JoinColumn({ name: 'coletor_id' })
   coletor: Coletor;
 }

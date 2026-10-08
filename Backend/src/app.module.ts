@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+﻿import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -6,6 +6,7 @@ import { ObjetosModule } from './objetos/objetos.module';
 import { ColetorModule } from './coletor/coletor.module';
 import { UsuariosModule } from './usuario/usuarios.module';
 import { ColetaModule } from './coleta/coleta.module';
+import { DescarteModule } from './Descarte/descarte.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ColetaModule } from './coleta/coleta.module';
     ColetorModule,
     UsuariosModule,
     ColetaModule,
+    DescarteModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -12,4 +12,8 @@ export class CreateObjetoDto {
   @IsNumber()
   @Min(0, { message: 'A quantidade deve ser maior ou igual a zero' })
   quantidade: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  descarteId: number;
 }

@@ -5,21 +5,25 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Coleta } from '../../coleta/entities/coleta.entity';
+import { Descarte } from '../../Descarte/entities/descarte.entity';
 
-@Entity()
+@Entity('coletores')
 export class Coletor {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Column()
+  @Column({ length: 150 })
   localizacao: string;
 
-  @Column()
+  @Column('float')
   capacidadeMaxima: number;
 
-  @Column({ default: 0 })
+  @Column('float', { default: 0 })
   volumeAtual: number;
 
   @OneToMany(() => Coleta, (coleta) => coleta.coletor)
   coletas: Coleta[];
+
+  @OneToMany(() => Descarte, (descarte) => descarte.coletor)
+  descartes: Descarte[];
 }
