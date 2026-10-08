@@ -19,16 +19,16 @@ export class DescarteController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.descarteService.findOne(+id);
+    return this.descarteService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateDescarteDto) {
-    return this.descarteService.update(+id, dto);
+    return this.descarteService.update(id, dto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.descarteService.remove(+id);
+    return this.descarteService.remove(id);
   }
 }

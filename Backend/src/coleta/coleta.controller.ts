@@ -19,16 +19,16 @@ export class ColetaController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.coletaService.findOne(+id);
+    return this.coletaService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateColetaDto: UpdateColetaDto) {
-    return this.coletaService.update(+id, updateColetaDto);
+    return this.coletaService.update(id, updateColetaDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.coletaService.remove(+id);
+    return this.coletaService.remove(id);
   }
 }

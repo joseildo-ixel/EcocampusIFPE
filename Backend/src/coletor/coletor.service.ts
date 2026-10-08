@@ -17,7 +17,7 @@ export class ColetorService {
     return this.coletorRepository.save(coletor);
   }
 
-  async atualizarVolume(id: number, novoDescarte: number) {
+  async atualizarVolume(id: string, novoDescarte: number) {
     const coletor = await this.findOne(id);
 
     coletor.volumeAtual += novoDescarte;
@@ -25,7 +25,7 @@ export class ColetorService {
     return this.coletorRepository.save(coletor);
   }
 
-  async resetar(id: number) {
+  async resetar(id: string) {
     const coletor = await this.findOne(id);
 
     coletor.volumeAtual = 0;
@@ -33,7 +33,7 @@ export class ColetorService {
     return this.coletorRepository.save(coletor);
   }
 
-  private async findOne(id: number) {
+  private async findOne(id: string) {
     const coletor = await this.coletorRepository.findOneBy({ id });
 
     if (!coletor) {

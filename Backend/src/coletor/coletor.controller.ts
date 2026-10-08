@@ -13,11 +13,11 @@ export class ColetorController {
 
   @Post(':id/atualizar')
   atualizarVolume(@Param('id') id: string, @Body('volume') volume: number) {
-    return this.coletorService.atualizarVolume(+id, volume);
+    return this.coletorService.atualizarVolume(id, volume);
   }
 
   @Post(':id/reset')
   resetar(@Param('id') id: string) {
-    return this.coletorService.resetar(+id);
+    return this.coletorService.resetar(id);
   }
 }

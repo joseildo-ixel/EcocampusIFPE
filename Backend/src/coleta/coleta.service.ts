@@ -22,7 +22,7 @@ export class ColetaService {
     return this.coletaRepository.find();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const coleta = await this.coletaRepository.findOneBy({ id });
 
     if (!coleta) {
@@ -32,7 +32,7 @@ export class ColetaService {
     return coleta;
   }
 
-  async update(id: number, updateColetaDto: UpdateColetaDto) {
+  async update(id: string, updateColetaDto: UpdateColetaDto) {
     const coleta = await this.findOne(id);
 
     Object.assign(coleta, updateColetaDto);
@@ -40,7 +40,7 @@ export class ColetaService {
     return this.coletaRepository.save(coleta);
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const coleta = await this.findOne(id);
 
     await this.coletaRepository.remove(coleta);
