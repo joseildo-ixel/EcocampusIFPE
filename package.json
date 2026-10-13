@@ -5,5 +5,8 @@
     "@nestjs/typeorm": "^12.0.2",
     "pg": "^8.23.1",
     "typeorm": "^1.1.1"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2"
   }
 }
