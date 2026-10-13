@@ -5,8 +5,8 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_DB: ecocampus
-      POSTGRES_USER: ecocampus_user
-      POSTGRES_PASSWORD: ecocampus_dev_123
+      POSTGRES_USER: ecocampus-user
+      POSTGRES_PASSWORD: ecocampus-password-123
     ports:
       - "5432:5432"
     volumes:
