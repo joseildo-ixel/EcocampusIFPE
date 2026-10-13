@@ -1,11 +1,15 @@
-﻿{
+{
   "name": "backend",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "nest start",
-    "start:dev": "nest start --watch"
+    "start:dev": "nest start --watch",
+    "migration:generate": "typeorm-ts-node-commonjs migration:generate",
+    "migration:run": "typeorm-ts-node-commonjs migration:run",
+    "migration:revert": "typeorm-ts-node-commonjs migration:revert",
+    "migration:show": "typeorm-ts-node-commonjs migration:show"
   },
   "keywords": [],
   "author": "",
@@ -15,7 +19,7 @@
     "@nestjs/common": "^12.0.4",
     "@nestjs/core": "^12.0.4",
     "@nestjs/mapped-types": "*",
-    "@nestjs/platform-express": "^12.0.4",
+    "@nestjs/platform-express": "^12.0.1",
     "@nestjs/typeorm": "^12.0.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
@@ -32,6 +36,7 @@
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.2",
     "typescript": "^6.0.3",
+    "ts-node": "^10.9.2",
     "vitest": "^5.0.1"
   }
 }

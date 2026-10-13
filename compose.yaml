@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: ecocampus-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ecocampus
+      POSTGRES_USER: ecocampus_user
+      POSTGRES_PASSWORD: ecocampus_dev_123
+    ports:
+      - "5432:5432"
+    volumes:
+      - ecocampus_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ecocampus_user -d ecocampus"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  ecocampus_data:
