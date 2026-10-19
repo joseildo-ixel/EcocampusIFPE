@@ -1,16 +1,26 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Descarte } from '../../Descarte/entities/descarte.entity';
 
-@Entity()
+@Entity('coletores')
 export class Coletor {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Column()
+  @Column({ length: 255 })
   localizacao: string;
 
-  @Column()
+  @Column({ type: 'numeric', precision: 10, scale: 2 })
   capacidadeMaxima: number;
 
-  @Column({ default: 0 })
+  @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
   volumeAtual: number;
+
+  @Column({ default: true })
+  ativo: boolean;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  dataCriacao: Date;
+
+  @OneToMany(() => Descarte, (descarte) => descarte.coletor)
+  descartes: Descarte[];
 }

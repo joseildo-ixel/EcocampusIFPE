@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { ColetorController } from './coletor.controller';
 import { ColetorService } from './coletor.service';
 
@@ -8,7 +9,7 @@ describe('ColetorController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ColetorController],
-      providers: [ColetorService],
+      providers: [{ provide: ColetorService, useValue: {} }],
     }).compile();
 
     controller = module.get<ColetorController>(ColetorController);

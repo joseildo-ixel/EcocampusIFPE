@@ -39,28 +39,47 @@ O sistema atende a toda a comunidade do IFPE (alunos e servidores), bem como vis
 
 ## Como rodar o projeto localmente
 
-1. Navegue até a pasta do backend: `cd Backend`
-2. Instale as dependências: `npm install`
-3. Inicie o servidor: `npm run start:dev`
+1. Inicie o PostgreSQL pelo Docker, se ainda não estiver ativo:
+   `docker run --name ecocampus-db -e POSTGRES_PASSWORD=senha123 -e POSTGRES_DB=ecocampus -p 5432:5432 -d postgres`
+2. Navegue até a pasta do backend: `cd Backend`
+3. Instale as dependências: `npm install`
+4. Configure as variáveis de conexão, se necessário. No PowerShell:
+   ```powershell
+   $env:DB_HOST="127.0.0.1"
+   $env:DB_PORT="5432"
+   $env:DB_USERNAME="postgres"
+   $env:DB_PASSWORD="senha123"
+   $env:DB_NAME="ecocampus"
+   ```
+5. Inicie o servidor: `npm run start:dev`
+
+As migrations pendentes são executadas na inicialização. O backend usa UUIDs nos recursos e não habilita `synchronize`; alterações no esquema devem ser versionadas em migrations.
 
 ## Exemplos de Uso (Testando o CRUD via CLI)
 
-Após iniciar o servidor, você pode testar as rotas em um novo terminal:
+Após iniciar o servidor, os recursos abaixo têm endpoints `POST`, `GET`, `GET /:id`, `PATCH /:id` e `DELETE /:id`:
 
-**Listar todos os Usuários:**
-> curl -X GET http://localhost:3000/usuarios
+- `http://localhost:3000/usuarios`
+- `http://localhost:3000/objetos`
+- `http://localhost:3000/api/coletor`
+- `http://localhost:3000/descarte`
 
-**Listar todos os Descartes registrados:**
-> curl -X GET http://localhost:3000/descarte
+As listagens aceitam `page` e `limit` (máximo 100), além de filtros específicos por recurso. As respostas de listagem têm o formato `{ "data": [...], "meta": { "page": 1, "limit": 20, "total": 0, "totalPages": 0 } }`.
 
-**Listar todas as Coletas agendadas/realizadas:**
-> curl -X GET http://localhost:3000/coleta
+O cadastro de usuários valida e-mail, senha e função; as senhas são armazenadas com hash e não retornadas pela API. Um descarte exige UUIDs de usuário e coletor e atualiza o volume do coletor dentro da mesma transação. Itens de catálogo podem ser associados ao descarte por `itens: [{ "objetoId": "<uuid>", "quantidade": 1 }]`.
 
-**Listar Objetos (Catálogo Maker):**
-> curl -X GET http://localhost:3000/objetos
+Exemplo para listar itens do catálogo:
 
-**Criar um novo coletor:**
-> curl -X POST http://localhost:3000/api/coletor
+```powershell
+curl.exe "http://localhost:3000/objetos?page=1&limit=10&tipo=eletrônico"
+```
 
-**Zerar o volume do coletor (Reset):**
-> curl -X POST http://localhost:3000/api/coletor/1/reset
+O volume também pode ser ajustado pela rota `POST /api/coletor/:id/atualizar` com corpo `{ "volume": 1.5 }`; exceder a capacidade retorna `400`. `POST /api/coletor/:id/reset` zera o volume.
+
+### Testes
+
+Na pasta `Backend`:
+
+- `npm test` executa os testes unitários.
+- `npm run test:e2e` inicia a aplicação em uma porta aleatória e executa testes HTTP contra o PostgreSQL configurado em `DB_*`. O teste cria dados temporários e os remove ao final.
+- `npm run lint` executa o ESLint nos fontes TypeScript.

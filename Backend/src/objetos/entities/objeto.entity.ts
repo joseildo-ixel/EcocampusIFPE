@@ -1,19 +1,29 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { DescarteItem } from './descarte-item.entity';
 
-@Entity()
+@Entity('objetos')
 export class Objeto {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @Column()
+  @Column({ length: 255 })
   nome: string;
 
-  @Column({ nullable: true })
+  @Column('text')
   descricao: string;
 
-  @Column()
-  quantidade: number;
+  @Column({ length: 50 })
+  tipo: string; // 'metal', 'plástico', 'vidro', 'papel', 'eletrônico'
 
-  @Column()
-  descarteId: number;
+  @Column({ type: 'decimal', precision: 5, scale: 2 })
+  pesoKg: number; // Peso em quilogramas
+
+  @Column({ default: true })
+  ativo: boolean;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  dataCriacao: Date;
+
+  @OneToMany(() => DescarteItem, (item) => item.objeto)
+  itensDescarte: DescarteItem[];
 }

@@ -6,62 +6,74 @@
 **Equipe:** Eliabe Rafael, Erik Jerônimo, Joseildo dos Santos e Luis Felipe  
 **Avaliador:** `<...>` · **Data:** `<...>`
 
-Checkpoint técnico: esta etapa serve para verificar se o núcleo do backend está funcionando antes da integração com frontend, segurança e implantação. Neste momento, o projeto já tem uma estrutura inicial, mas algumas partes importantes ainda estão em desenvolvimento.
+Checkpoint técnico atualizado após a implementação do CRUD persistente, a execução das migrations no PostgreSQL do Docker, os testes de integração HTTP e as verificações de qualidade do backend. A entidade `Coleta` continua removida; o recurso `Coletor` representa o recipiente físico, e `DescarteItem` registra os objetos associados a um descarte.
 
 ## Pré-requisitos (sim/não)
 
 | Verificação | Sim | Não | Observação |
 | --- | :---: | :---: | --- |
-| Repositório acessível, com o código do backend | ☒ | ☐ | O backend está na pasta `Backend`, usando NestJS e TypeScript. |
-| Modelo de dados versionado (migrações aplicadas, sem erro) | ☐ | ☒ | Ainda falta finalizar a integração com o banco, as entidades e as migrações. |
-| Ao menos um endpoint de API funcionando fim a fim (banco → resposta) | ☐ | ☒ | Os endpoints já foram criados, mas os services ainda retornam respostas provisórias e não fazem persistência real. |
+| Repositório acessível, com o código do backend | ☒ | ☐ | Backend NestJS e TypeScript na pasta `Backend`. |
+| Modelo de dados versionado (migrações aplicadas, sem erro) | ☒ | ☐ | As três migrations foram registradas no PostgreSQL `ecocampus`; as tabelas `usuarios`, `objetos`, `coletores`, `descartes` e `itens_descarte` foram verificadas. |
+| Ao menos um endpoint de API funcionando fim a fim (banco → resposta) | ☒ | ☐ | Testes HTTP criam, consultam, atualizam e removem registros usando o banco PostgreSQL real. |
 
 ## Critérios
 
 | Critério | Peso | 4 — Excelente | 3 — Adequado | 2 — Em desenvolvimento | 0–1 — Insuficiente | Nível |
 | --- | ---: | --- | --- | --- | --- | :---: |
-| **1. Modelo de dados** | 3,0 | 5+ models corretos, com relações, `on_delete` justificado e restrições de integridade testadas | 5+ models corretos, com relações e restrições básicas | 3–4 models ou relações confusas | Menos de 3 models ou modelagem que não sustenta as regras | **0–1** |
-| **2. API e CRUD** | 4,0 | CRUD completo em 3+ recursos, com DTOs de entrada e saída separados | CRUD completo em 2 recursos | CRUD parcial | Não funciona | **2** |
-| **3. Validação e consultas** | 2,0 | Validação de servidor cobrindo as regras, mais filtros ou paginação | Validação de servidor cobrindo as regras principais | Validação incompleta | Sem validação de servidor | **2** |
-| **4. Organização do código** | 1,0 | Código legível, lint limpo, regra de negócio fora da view/controller | Lint limpo, código compreensível | Alguns problemas de organização | Código ilegível ou duplicado | **3** |
-| **Total** | **10** | | | | | **Em andamento** |
+| **1. Modelo de dados** | 3,0 | 5+ models corretos, com relações, `on_delete` justificado e restrições de integridade testadas | 5+ models corretos, com relações e restrições básicas | 3–4 models ou relações confusas | Menos de 3 models ou modelagem que não sustenta as regras | **4** |
+| **2. API e CRUD** | 4,0 | CRUD completo em 3+ recursos, com DTOs de entrada e saída separados | CRUD completo em 2 recursos | CRUD parcial | Não funciona | **4** |
+| **3. Validação e consultas** | 2,0 | Validação de servidor cobrindo as regras, mais filtros ou paginação | Validação de servidor cobrindo as regras principais | Validação incompleta | Sem validação de servidor | **4** |
+| **4. Organização do código** | 1,0 | Código legível, lint limpo, regra de negócio fora da view/controller | Lint limpo, código compreensível | Alguns problemas de organização | Código ilegível ou duplicado | **4** |
+| **Total ponderado** | **10** | | | | | **10,0 / 10 — Concluído** |
+
+O total ponderado usa `peso × nível ÷ 4` para cada critério.
 
 ### Justificativa dos níveis
 
-**1. Modelo de dados — nível 0–1**  
-A estrutura dos módulos já está separada, mas ainda não foi encontrada uma implementação final de entidades, relacionamentos, banco de dados ou migrações. Por isso, ainda não dá para considerar que o modelo de dados esteja funcionando.
+**1. Modelo de dados — nível 4**
+O modelo contém cinco entidades: `Usuario`, `Objeto`, `Coletor`, `Descarte` e `DescarteItem`. As relações e integridade referencial estão versionadas em migrations. O histórico de descartes impede exclusão do usuário associado (`RESTRICT`); excluir um coletor preserva o descarte e limpa sua referência (`SET NULL`); os itens são removidos junto com o descarte (`CASCADE`); e um objeto usado em um descarte não pode ser excluído (`RESTRICT`). Os testes de integração verificam os comportamentos de restrição, preservação e cascata.
 
-**2. API e CRUD — nível 2**  
-Já existem controllers e rotas para usuários, objetos, coleta, coletor e descarte. Alguns recursos possuem as rotas de CRUD montadas e existem DTOs de criação e atualização. Porém, os services ainda retornam textos provisórios, sem salvar ou consultar dados de verdade. O CRUD está parcialmente pronto.
+**2. API e CRUD — nível 4**
+Usuários, objetos, coletores e descartes têm operações de criação, listagem, consulta por UUID, atualização e remoção com persistência no PostgreSQL. Cada recurso usa DTOs de entrada e DTOs de resposta; a resposta de usuário não expõe senha. O teste HTTP verifica o CRUD dos quatro recursos e os itens relacionados ao descarte.
 
-**3. Validação e consultas — nível 2**  
-Já existem algumas validações nos DTOs, como campos obrigatórios, datas, números e valores mínimos. Mesmo assim, ainda faltam validações específicas das regras do sistema, tratamento de erros, consultas reais, filtros e paginação.
+**3. Validação e consultas — nível 4**
+O `ValidationPipe` global rejeita campos não declarados e valida os DTOs de entrada, incluindo formatos, faixas numéricas, UUIDs, status e itens aninhados. As listagens têm filtros próprios e paginação com limite máximo. Os testes verificam dados inválidos, conflito de e-mail, capacidade do coletor, filtros e paginação.
 
-**4. Organização do código — nível 3**  
-A divisão em módulos, controllers, services, DTOs e entities deixa o projeto relativamente fácil de entender. A equipe ainda precisa revisar o lint e continuar tirando a lógica provisória dos services, mas a organização inicial está adequada.
+**4. Organização do código — nível 4**
+Controllers cuidam das rotas, DTOs validam entradas e os services concentram persistência e regras de negócio. O ESLint foi configurado e executado sem warnings ou erros. A compilação TypeScript, o build NestJS e as suítes de teste passaram.
 
-## Partes que estão em progresso
+## Testes e verificações executados
 
-- [ ] Criar e finalizar as entidades do banco de dados.
-- [ ] Definir os relacionamentos entre usuários, descartes, coletas, coletores e objetos.
-- [ ] Configurar a conexão com o banco de dados.
-- [ ] Criar e aplicar as migrações.
-- [ ] Trocar as respostas provisórias dos services pela lógica real do sistema.
-- [ ] Implementar o CRUD completo com persistência.
-- [ ] Melhorar as validações de acordo com as regras do EcoCampusIFPE.
-- [ ] Adicionar tratamento de erros para registros inexistentes e dados inválidos.
-- [ ] Criar consultas, filtros e, se necessário, paginação.
-- [ ] Fazer testes dos endpoints usando o banco de dados.
-- [ ] Revisar o lint e os testes antes da integração com o frontend.
+| Verificação | Resultado | Evidência |
+| --- | --- | --- |
+| `npm test` | ✅ Passou | 5 testes unitários/smoke em 5 arquivos. |
+| `npm run test:e2e` | ✅ Passou | 1 teste de integração HTTP contra PostgreSQL real; verifica CRUD dos quatro recursos, hash de senha, itens, filtros, paginação, validação, chaves estrangeiras, capacidade/reset do coletor e políticas de exclusão. |
+| `npx tsc --noEmit` | ✅ Passou | Sem erros de tipo no backend. |
+| `npx nest build` | ✅ Passou | Aplicação NestJS compilada. |
+| `npm run lint` | ✅ Passou | ESLint executado em `src` sem warnings nem erros. |
+| Estado do PostgreSQL Docker | ✅ Confirmado | As três migrations e as cinco tabelas do domínio foram conferidas; as chaves estrangeiras têm as políticas de exclusão previstas. |
+
+## Partes concluídas
+
+- [x] Alinhar entidades, DTOs e banco de dados.
+- [x] Manter `Coleta` removida e modelar o recurso `Coletor` no lugar apropriado.
+- [x] Configurar TypeORM e migrations para PostgreSQL.
+- [x] Implementar CRUD persistente para usuários, objetos, coletores e descartes.
+- [x] Criar DTOs separados para entrada e resposta.
+- [x] Hash de senha e exclusão da senha das respostas da API.
+- [x] Validar dados, relações, erros e limites de capacidade.
+- [x] Adicionar filtros e paginação às listagens.
+- [x] Criar testes HTTP integrados ao PostgreSQL.
+- [x] Configurar e executar lint, checagem de tipos e build.
 
 ## Devolutiva
 
 **Pontos fortes:**
 
-A equipe conseguiu montar a base do backend em NestJS e separar o código por módulos relacionados ao problema do projeto. Os principais recursos já foram identificados e há uma primeira versão dos controllers, services e DTOs. Também já começamos a colocar validações nos dados de entrada.
+O backend agora persiste dados no PostgreSQL e implementa os fluxos CRUD nos quatro recursos. As migrations preservam a versão inicial já aplicada e adicionam o esquema de recipiente físico, itens do descarte e regras de integridade referencial. Os testes de integração exercitam a API com o banco, além dos testes unitários, lint, type-check e build.
 
-**O que ajustar antes da Etapa 3 (sistema final):**
+**Próximos passos fora do escopo desta etapa:**
 
-O principal ajuste é transformar a estrutura atual em um backend realmente funcional. No estado atual, várias rotas ainda devolvem mensagens provisórias e não fazem operações reais no banco. Precisamos priorizar a modelagem dos dados, a integração com o banco, as migrações e a implementação dos services. Depois disso, será necessário testar os fluxos completos e melhorar as validações.
+Integrar o frontend e, antes de uma implantação pública, revisar autenticação/autorização, gestão segura de credenciais e configuração de produção. Os testes de integração dependem do PostgreSQL definido pelas variáveis `DB_*` estar disponível.
 
-**Aprovado para seguir?** ☐ Sim · ☒ Sim, com ajustes · ☐ Não — corrigir e reenviar (recuperação)
+**Aprovado para seguir?** ☒ Sim · ☐ Sim, com ajustes · ☐ Não — corrigir e reenviar (recuperação)

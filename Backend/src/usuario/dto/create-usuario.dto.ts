@@ -1,4 +1,12 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class CreateUsuarioDto {
   @IsString()
@@ -12,4 +20,13 @@ export class CreateUsuarioDto {
   @IsString()
   @MinLength(6, { message: 'A senha deve ter no mínimo 6 caracteres' })
   senha: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'A função do usuário é obrigatória' })
+  @IsIn(['admin', 'usuario', 'coletor'])
+  role: string;
+
+  @IsOptional()
+  @IsBoolean()
+  ativo?: boolean;
 }
