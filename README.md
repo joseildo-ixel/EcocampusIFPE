@@ -76,6 +76,206 @@ curl.exe "http://localhost:3000/objetos?page=1&limit=10&tipo=eletrônico"
 
 O volume também pode ser ajustado pela rota `POST /api/coletor/:id/atualizar` com corpo `{ "volume": 1.5 }`; exceder a capacidade retorna `400`. `POST /api/coletor/:id/reset` zera o volume.
 
+## Contrato da API
+
+A API do EcoCampusIFPE foi desenvolvida com NestJS e disponibiliza operações para usuários, coletores, descartes e objetos.
+
+### 1. Usuários
+
+| Método | Endpoint | Descrição |
+|---|---|---|
+| POST | `/usuarios` | Cadastrar usuário |
+| GET | `/usuarios` | Listar usuários |
+| GET | `/usuarios/:id` | Consultar usuário |
+| PATCH | `/usuarios/:id` | Atualizar usuário |
+| DELETE | `/usuarios/:id` | Excluir usuário |
+
+**Exemplo de cadastro:**
+
+```json
+{
+  "nome": "Maria Silva",
+  "email": "maria@ifpe.edu.br",
+  "senha": "senha123",
+  "role": "usuario",
+  "ativo": true
+}
+```
+
+O campo `role` aceita os valores `admin`, `usuario` e `coletor`. A senha deve possuir pelo menos seis caracteres e é armazenada com hash. Ela não é incluída nas respostas da API.
+
+**Filtros da listagem:** `nome`, `email`, `role` e `ativo`.
+
+### 2. Coletores
+
+| Método | Endpoint | Descrição |
+|---|---|---|
+| POST | `/api/coletor` | Cadastrar coletor |
+| GET | `/api/coletor` | Listar coletores |
+| GET | `/api/coletor/:id` | Consultar coletor |
+| PATCH | `/api/coletor/:id` | Atualizar coletor |
+| DELETE | `/api/coletor/:id` | Excluir coletor |
+| POST | `/api/coletor/:id/atualizar` | Adicionar volume |
+| POST | `/api/coletor/:id/reset` | Zerar volume |
+
+**Exemplo de cadastro:**
+
+```json
+{
+  "localizacao": "Bloco A - Entrada",
+  "capacidadeMaxima": 100,
+  "ativo": true
+}
+```
+
+**Exemplo de atualização do volume:**
+
+```json
+{
+  "volume": 1.5
+}
+```
+
+A capacidade máxima deve ser maior que zero. O volume adicionado também deve ser positivo e não pode ultrapassar a capacidade disponível.
+
+A operação de reset zera o volume atual e altera para `finalizado` o status dos descartes associados ao coletor que ainda não estejam finalizados.
+
+**Filtros da listagem:** `localizacao` e `ativo`.
+
+### 3. Descartes
+
+| Método | Endpoint | Descrição |
+|---|---|---|
+| POST | `/descarte` | Registrar descarte |
+| GET | `/descarte` | Listar descartes |
+| GET | `/descarte/:id` | Consultar descarte |
+| PATCH | `/descarte/:id` | Atualizar descarte |
+| DELETE | `/descarte/:id` | Excluir descarte |
+
+**Exemplo de cadastro:**
+
+```json
+{
+  "tipoResiduo": "eletronico",
+  "pesoKg": 2.5,
+  "status": "pendente",
+  "dataDescarte": "2026-10-30T10:00:00.000Z",
+  "destino": "Coletor do Bloco A",
+  "observacoes": "Equipamentos eletrônicos sem uso",
+  "usuarioId": "UUID_DO_USUARIO",
+  "coletorId": "UUID_DO_COLETOR",
+  "itens": [
+    {
+      "objetoId": "UUID_DO_OBJETO",
+      "quantidade": 2
+    }
+  ]
+}
+```
+
+O cadastro exige `tipoResiduo`, `pesoKg`, `destino`, `usuarioId` e `coletorId`. A lista `itens` é opcional.
+
+O peso deve estar entre `0.01` e `999.99` kg. Os status aceitos são `pendente`, `processado` e `finalizado`. Quando não informado, o status recebe o valor `pendente`.
+
+Cada item deve possuir um `objetoId` válido e uma quantidade inteira maior que zero. Um mesmo objeto não pode aparecer repetidamente na lista de itens do mesmo descarte.
+
+O sistema verifica se o usuário, o coletor e os objetos informados existem. Também verifica se o coletor está ativo e possui capacidade disponível.
+
+**Filtros da listagem:** `status`, `tipoResiduo`, `usuarioId` e `coletorId`.
+
+Na atualização (`PATCH`), os campos são opcionais, mas não é permitido alterar `usuarioId`, `coletorId` ou a lista de itens por essa rota.
+
+### 4. Objetos
+
+| Método | Endpoint | Descrição |
+|---|---|---|
+| POST | `/objetos` | Cadastrar objeto |
+| GET | `/objetos` | Listar objetos |
+| GET | `/objetos/:id` | Consultar objeto |
+| PATCH | `/objetos/:id` | Atualizar objeto |
+| DELETE | `/objetos/:id` | Excluir objeto |
+
+**Exemplo de cadastro:**
+
+```json
+{
+  "nome": "Monitor",
+  "descricao": "Monitor de computador sem funcionamento",
+  "tipo": "eletronico",
+  "pesoKg": 3.5,
+  "ativo": true
+}
+```
+
+O nome, a descrição, o tipo e o peso são obrigatórios. O peso deve estar entre `0.01` e `999.99` kg.
+
+**Filtros da listagem:** `nome`, `tipo` e `ativo`.
+
+Um objeto associado a itens de descarte não pode ser excluído.
+
+### 5. Paginação
+
+Todas as rotas de listagem aceitam os parâmetros:
+
+| Parâmetro | Descrição | Padrão |
+|---|---|---|
+| `page` | Número da página | 1 |
+| `limit` | Quantidade de registros por página | 20 |
+
+O limite máximo permitido é de 100 registros por página.
+
+**Exemplo:**
+
+```http
+GET /objetos?page=1&limit=10&tipo=eletronico
+```
+
+As respostas das listagens seguem o formato:
+
+```json
+{
+  "data": [],
+  "meta": {
+    "page": 1,
+    "limit": 20,
+    "total": 0,
+    "totalPages": 0
+  }
+}
+```
+
+### 6. Respostas HTTP
+
+A API utiliza os códigos HTTP padrão do NestJS para as operações implementadas:
+
+| Código | Significado | Situação |
+|---|---|---|
+| 200 | OK | Consulta, atualização ou exclusão realizada |
+| 201 | Created | Cadastro ou operação POST realizada |
+| 400 | Bad Request | Dados inválidos ou regra de negócio não atendida |
+| 404 | Not Found | Registro ou referência não encontrada |
+| 409 | Conflict | Conflito com dados ou restrições do banco |
+
+Exemplos de situações de erro:
+
+- E-mail já cadastrado.
+- Identificador UUID inválido.
+- Usuário, coletor ou objeto não encontrado.
+- Tentativa de ultrapassar a capacidade do coletor.
+- Tentativa de excluir usuário com descartes associados.
+- Tentativa de excluir objeto associado a um descarte.
+
+### 7. Validação das requisições
+
+O backend utiliza `ValidationPipe` global para validar os dados recebidos.
+
+- Campos que não pertencem ao DTO são rejeitados.
+- Os tipos de alguns valores são convertidos automaticamente.
+- Campos obrigatórios e formatos são validados antes do processamento.
+- Identificadores das rotas são validados como UUID.
+
+As atualizações utilizam `PATCH` e permitem enviar somente os campos que serão modificados.
+
 ### Testes
 
 Na pasta `Backend`:
