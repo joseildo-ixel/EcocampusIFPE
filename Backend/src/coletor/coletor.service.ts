@@ -79,7 +79,11 @@ export class ColetorService {
           'A capacidade máxima não pode ser menor que o volume atual',
         );
       }
-      return coletores.save(coletores.merge(coletor, dto));
+      const coletorSalvo = await coletores.save(coletores.merge(coletor, dto));
+      if (Number(coletorSalvo.volumeAtual) >= Number(coletorSalvo.capacidadeMaxima) * 0.8) {
+        console.warn(`⚠️ ALERTA CINFRA: A Lixeira ${coletorSalvo.id} atingiu 80% ou mais da sua capacidade!`);
+      }
+      return coletorSalvo;
     });
     return this.toResponse(updated);
   }
@@ -105,8 +109,16 @@ export class ColetorService {
       if (volumeAtual + novoDescarte > capacidade) {
         throw new BadRequestException('A capacidade do coletor seria excedida');
       }
+      
+      // SUBSTITUA O RETURN DIRETO POR ESTAS LINHAS:
       coletor.volumeAtual = Number((volumeAtual + novoDescarte).toFixed(2));
-      return coletores.save(coletor);
+      const coletorSalvo = await coletores.save(coletor);
+
+      if (Number(coletorSalvo.volumeAtual) >= Number(coletorSalvo.capacidadeMaxima) * 0.8) {
+        console.warn(`⚠️ ALERTA CINFRA: A Lixeira ${coletorSalvo.id} atingiu 80% ou mais da sua capacidade!`);
+      }
+
+      return coletorSalvo;
     });
     return this.toResponse(updated);
   }
