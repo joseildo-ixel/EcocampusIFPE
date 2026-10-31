@@ -15,6 +15,9 @@ export class CreateObjetoDto {
   @IsNotEmpty({ message: 'O nome não pode ser vazio' })
   @MaxLength(255)
   nome: string;
+  @IsOptional()
+  @IsBoolean()
+  pertencePatrimonio?: boolean;
 
   @IsString()
   @IsNotEmpty()

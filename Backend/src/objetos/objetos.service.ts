@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -20,7 +21,10 @@ export class ObjetosService {
     private readonly objetos: Repository<Objeto>,
   ) {}
 
-  async create(dto: CreateObjetoDto): Promise<ObjetoResponseDto> {
+  async create(dto: any): Promise<ObjetoResponseDto> {
+    if (dto.pertencePatrimonio === true) {
+      throw new BadRequestException('Proibido: Não é permitido descartar equipamentos que pertencem ao patrimônio do IFPE.');
+    }
     const objeto = await this.objetos.save(this.objetos.create(dto));
     return this.toResponse(objeto);
   }

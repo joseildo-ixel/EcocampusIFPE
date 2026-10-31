@@ -24,6 +24,9 @@ export class Objeto {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   dataCriacao: Date;
 
+  @Column({ default: false })
+  pertencePatrimonio: boolean;
+
   @OneToMany(() => DescarteItem, (item) => item.objeto)
   itensDescarte: DescarteItem[];
 }
