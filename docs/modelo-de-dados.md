@@ -1,4 +1,4 @@
-﻿# Modelo de Dados — EcoCampusIFPE
+# Modelo de Dados — EcoCampusIFPE
 
 ## 1. Visão geral
 
@@ -166,3 +166,55 @@ A estrutura inicial da tabela `coletores` possuía outros campos, que foram post
 A migration `PreserveDisposalHistory` alterou a regra de exclusão de usuários, substituindo `CASCADE` por `RESTRICT`.
 
 Este documento representa o modelo de domínio atual, considerando as entidades e as alterações realizadas pelas migrations.
+## 7. Relacionamentos e regras de exclusão
+
+As chaves estrangeiras garantem a integridade dos relacionamentos entre as tabelas.
+
+| Relacionamento | Regra ON DELETE | Justificativa de negócio |
+|---|---|---|
+| `descartes.usuarioId` → `usuarios.id` | RESTRICT | Impede excluir um usuário que possui descartes registrados, preservando o histórico e a identificação de quem realizou cada operação. |
+| `descartes.coletorId` → `coletores.id` | SET NULL | Permite excluir um coletor sem apagar os descartes já registrados. O histórico permanece, mas perde a referência ao coletor excluído. |
+| `itens_descarte.descarteId` → `descartes.id` | CASCADE | Os itens dependem do descarte ao qual pertencem. Ao excluir o descarte, seus itens relacionados também são excluídos. |
+| `itens_descarte.objetoId` → `objetos.id` | RESTRICT | Impede excluir um objeto que já foi utilizado em itens de descarte, preservando a integridade dos registros históricos. |
+
+## 8. Restrições e índices
+
+### 8.1 Restrições UNIQUE
+
+- `usuarios.email`: impede que duas contas utilizem o mesmo endereço de e-mail.
+- `coletores.matricula`: definida como única na migration inicial. Posteriormente, a coluna tornou-se opcional. Assim, valores preenchidos não podem se repetir, mas podem existir registros sem matrícula.
+- `itens_descarte (descarteId, objetoId)`: impede que o mesmo objeto seja cadastrado mais de uma vez no mesmo descarte. Caso seja necessário aumentar a quantidade, o registro existente pode ser atualizado.
+
+### 8.2 Restrições NOT NULL e campos opcionais
+
+- As chaves primárias e os campos obrigatórios das entidades devem possuir valores.
+- `descartes.usuarioId` é obrigatório, pois todo descarte precisa estar associado a um usuário.
+- `descartes.coletorId` é opcional, pois um descarte pode existir sem estar vinculado a um coletor.
+- `descartes.observacoes` é opcional, pois o registro pode ser realizado sem observações.
+- Os campos antigos `nome`, `matricula`, `email`, `telefone` e `departamento` da estrutura inicial de `coletores` foram posteriormente tornados opcionais pela migration `CompleteDomainSchema`.
+
+### 8.3 Outras restrições
+
+- `itens_descarte.quantidade`: possui uma restrição CHECK que exige valor maior que zero.
+- As chaves primárias UUID identificam exclusivamente cada registro.
+- Campos como `ativo` e `volumeAtual` possuem valores padrão definidos para facilitar a criação dos registros.
+
+### 8.4 Índices
+
+As chaves primárias e as restrições UNIQUE criam índices automaticamente no PostgreSQL, contribuindo para a identificação e localização dos registros.
+
+Nas migrations analisadas, não foram identificadas definições explícitas de índices secundários adicionais.
+
+### 8.5 Validações da aplicação
+
+Além das restrições do banco, os DTOs utilizam validações do `class-validator`, como `IsNotEmpty`, `IsEmail`, `IsUUID`, `IsInt` e `Min`.
+
+Essas validações verificam os dados recebidos pela API antes do processamento. Elas são diferentes das restrições diretamente aplicadas pelo PostgreSQL.
+
+## 9. Observação sobre o ambiente do banco
+
+Durante a análise, foi identificado que o banco PostgreSQL existente no container Docker apresenta tabelas e relacionamentos diferentes daqueles definidos nas entidades e migrations atuais do projeto.
+
+Também não foi encontrada uma tabela de histórico de migrations nesse banco.
+
+Por esse motivo, as regras e os relacionamentos descritos neste documento foram definidos com base no código-fonte e nas migrations versionadas no repositório, e não na estrutura antiga encontrada no container.
