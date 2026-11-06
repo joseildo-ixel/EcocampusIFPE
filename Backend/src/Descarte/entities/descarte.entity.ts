@@ -21,7 +21,7 @@ export class Descarte {
   @Column({ type: 'timestamp' })
   dataDescarte: Date;
 
-  @Column({ type: 'numeric', precision: 5, scale: 2 })
+  @Column({ type: 'decimal', precision: 5, scale: 2 })
   pesoKg: number;
 
   @Column({ length: 50 })
@@ -30,8 +30,8 @@ export class Descarte {
   @Column({ length: 100 })
   destino: string; // Para onde foi o resíduo
 
-  @Column('text', { nullable: true })
-  observacoes: string;
+  @Column({ type: 'text', nullable: true })
+  observacoes: string | null;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   dataCriacao: Date;

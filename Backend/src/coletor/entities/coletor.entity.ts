@@ -9,10 +9,10 @@ export class Coletor {
   @Column({ length: 255 })
   localizacao: string;
 
-  @Column({ type: 'numeric', precision: 10, scale: 2 })
+  @Column({ type: 'decimal', precision: 5, scale: 2 })
   capacidadeMaxima: number;
 
-  @Column({ type: 'numeric', precision: 10, scale: 2, default: 0 })
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
   volumeAtual: number;
 
   @Column({ default: true })
