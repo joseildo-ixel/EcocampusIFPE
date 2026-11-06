@@ -5,18 +5,24 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  CreateDateColumn,
 } from 'typeorm';
 import { Usuario } from '../../usuario/entities/usuario.entity';
 import { Coletor } from '../../coletor/entities/coletor.entity';
 import { DescarteItem } from '../../objetos/entities/descarte-item.entity';
+import { DescarteStatus } from '../../common/enums/descarte-status.enum';
 
 @Entity('descartes')
 export class Descarte {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 50 })
-  status: string;
+  @Column({
+    type: 'enum',
+    enum: DescarteStatus,
+    enumName: 'descartes_status_enum',
+  })
+  status: DescarteStatus;
 
   @Column({ type: 'timestamp' })
   dataDescarte: Date;
@@ -33,7 +39,7 @@ export class Descarte {
   @Column({ type: 'text', nullable: true })
   observacoes: string | null;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ type: 'timestamp' })
   dataCriacao: Date;
 
   @Column({ type: 'uuid' })

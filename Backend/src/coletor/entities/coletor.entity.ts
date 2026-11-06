@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  CreateDateColumn,
+} from 'typeorm';
 import { Descarte } from '../../Descarte/entities/descarte.entity';
 
 @Entity('coletores')
@@ -18,7 +24,7 @@ export class Coletor {
   @Column({ default: true })
   ativo: boolean;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ type: 'timestamp' })
   dataCriacao: Date;
 
   @OneToMany(() => Descarte, (descarte) => descarte.coletor)

@@ -1,6 +1,8 @@
+import { DescarteStatus } from '../../common/enums/descarte-status.enum';
+
 export class DescarteResponseDto {
   id: string;
-  status: string;
+  status: DescarteStatus;
   dataDescarte: Date;
   pesoKg: number;
   tipoResiduo: string;

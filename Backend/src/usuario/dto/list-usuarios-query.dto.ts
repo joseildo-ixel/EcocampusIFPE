@@ -1,6 +1,7 @@
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsEmail, IsIn, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
 import { PageQueryDto } from '../../common/dto/page-query.dto';
+import { UsuarioRole } from '../../common/enums/usuario-role.enum';
 
 export class ListUsuariosQueryDto extends PageQueryDto {
   @IsOptional()
@@ -12,8 +13,8 @@ export class ListUsuariosQueryDto extends PageQueryDto {
   email?: string;
 
   @IsOptional()
-  @IsIn(['admin', 'usuario', 'coletor'])
-  role?: string;
+  @IsEnum(UsuarioRole)
+  role?: UsuarioRole;
 
   @IsOptional()
   @Transform(({ value }) =>

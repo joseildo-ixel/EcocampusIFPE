@@ -1,5 +1,6 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -33,4 +34,7 @@ export class DescarteItem {
 
   @Column({ type: 'integer' })
   quantidade: number;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  dataCriacao: Date;
 }
