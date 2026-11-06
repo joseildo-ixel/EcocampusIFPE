@@ -1,10 +1,12 @@
-import { IsIn, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsEnum, IsOptional } from 'class-validator';
 import { PageQueryDto } from '../../common/dto/page-query.dto';
+import { DescarteStatus } from '../../common/enums/descarte-status.enum';
+import { IsString, IsUUID } from 'class-validator';
 
 export class ListDescartesQueryDto extends PageQueryDto {
   @IsOptional()
-  @IsIn(['pendente', 'processado', 'finalizado'])
-  status?: string;
+  @IsEnum(DescarteStatus)
+  status?: DescarteStatus;
 
   @IsOptional()
   @IsString()

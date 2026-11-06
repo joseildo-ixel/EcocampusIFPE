@@ -1,12 +1,13 @@
 import {
   IsBoolean,
   IsEmail,
-  IsIn,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
   MinLength,
 } from 'class-validator';
+import { UsuarioRole } from '../../common/enums/usuario-role.enum';
 
 export class CreateUsuarioDto {
   @IsString()
@@ -21,10 +22,9 @@ export class CreateUsuarioDto {
   @MinLength(6, { message: 'A senha deve ter no mínimo 6 caracteres' })
   senha: string;
 
-  @IsString()
+  @IsEnum(UsuarioRole)
   @IsNotEmpty({ message: 'A função do usuário é obrigatória' })
-  @IsIn(['admin', 'usuario', 'coletor'])
-  role: string;
+  role: UsuarioRole;
 
   @IsOptional()
   @IsBoolean()

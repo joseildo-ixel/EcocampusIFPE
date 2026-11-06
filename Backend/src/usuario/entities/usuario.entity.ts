@@ -1,5 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  CreateDateColumn,
+} from 'typeorm';
 import { Descarte } from '../../Descarte/entities/descarte.entity';
+import { UsuarioRole } from '../../common/enums/usuario-role.enum';
 
 @Entity('usuarios')
 export class Usuario {
@@ -15,13 +22,13 @@ export class Usuario {
   @Column({ length: 255, select: false })
   senha: string;
 
-  @Column({ length: 50 })
-  role: string; // 'admin', 'usuario', 'coletor'
+  @Column({ type: 'enum', enum: UsuarioRole, enumName: 'usuarios_role_enum' })
+  role: UsuarioRole;
 
   @Column({ default: true })
   ativo: boolean;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ type: 'timestamp' })
   dataCriacao: Date;
 
   @OneToMany(() => Descarte, (descarte) => descarte.usuario)

@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  CreateDateColumn,
+} from 'typeorm';
 import { DescarteItem } from './descarte-item.entity';
 
 @Entity('objetos')
@@ -21,7 +27,7 @@ export class Objeto {
   @Column({ default: true })
   ativo: boolean;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ type: 'timestamp' })
   dataCriacao: Date;
 
   @Column({ default: false })

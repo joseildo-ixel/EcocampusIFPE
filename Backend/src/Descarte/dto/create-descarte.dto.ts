@@ -2,7 +2,7 @@ import { Type } from 'class-transformer';
 import {
   IsDateString,
   IsArray,
-  IsIn,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -13,6 +13,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+import { DescarteStatus } from '../../common/enums/descarte-status.enum';
 import { CreateDescarteItemDto } from './create-descarte-item.dto';
 
 export class CreateDescarteDto {
@@ -28,10 +29,8 @@ export class CreateDescarteDto {
   pesoKg: number;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(50)
-  @IsIn(['pendente', 'processado', 'finalizado'])
-  status?: string;
+  @IsEnum(DescarteStatus)
+  status?: DescarteStatus;
 
   @IsOptional()
   @IsDateString()

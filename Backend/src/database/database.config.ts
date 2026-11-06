@@ -6,6 +6,7 @@ import { Objeto } from '../objetos/entities/objeto.entity';
 import { CompleteDomainSchema1000000000001 } from '../migrations/1000000000001-CompleteDomainSchema';
 import { CreateTables1000000000000 } from '../migrations/1000000000000-CreateTables';
 import { PreserveDisposalHistory1000000000002 } from '../migrations/1000000000002-PreserveDisposalHistory';
+import { UserAndDatabaseConstraints1000000000003 } from '../migrations/1000000000003-UserAndDatabaseConstraints';
 import { Usuario } from '../usuario/entities/usuario.entity';
 
 export const databaseConfig: TypeOrmModuleOptions = {
@@ -20,6 +21,7 @@ export const databaseConfig: TypeOrmModuleOptions = {
     CreateTables1000000000000,
     CompleteDomainSchema1000000000001,
     PreserveDisposalHistory1000000000002,
+    UserAndDatabaseConstraints1000000000003,
   ],
   migrationsRun: true,
   synchronize: false,
