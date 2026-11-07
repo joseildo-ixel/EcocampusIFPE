@@ -8,7 +8,11 @@
     "start:dev": "nest start --watch",
     "test": "vitest run --exclude src/backend.e2e.spec.ts",
     "test:e2e": "vitest run src/backend.e2e.spec.ts",
-    "lint": "eslint src --max-warnings=0"
+    "lint": "eslint src --max-warnings=0",
+    "typeorm": "typeorm-ts-node-commonjs -d src/data-source.ts",
+    "migration:generate": "npm run typeorm -- migration:generate",
+    "migration:run": "npm run typeorm -- migration:run",
+    "migration:revert": "npm run typeorm -- migration:revert"
   },
   "keywords": [],
   "author": "",
@@ -37,6 +41,7 @@
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.2",
     "eslint": "^10.12.0",
+    "ts-node": "^10.9.2",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.71.0",
     "vitest": "^5.0.1"
