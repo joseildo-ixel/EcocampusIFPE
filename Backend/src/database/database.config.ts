@@ -12,7 +12,7 @@ import { Usuario } from '../usuario/entities/usuario.entity';
 export const databaseConfig: TypeOrmModuleOptions = {
   type: 'postgres',
   host: process.env.DB_HOST || '127.0.0.1',
-  port: Number(process.env.DB_PORT || 5432),
+  port: Number(process.env.DB_PORT || 5433),
   username: process.env.DB_USERNAME || 'postgres',
   password: process.env.DB_PASSWORD || 'senha123',
   database: process.env.DB_NAME || 'ecocampus',

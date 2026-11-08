@@ -21,12 +21,16 @@ export class ObjetosService {
     private readonly objetos: Repository<Objeto>,
   ) {}
 
-  async create(dto: any): Promise<ObjetoResponseDto> {
+  async create(dto: CreateObjetoDto): Promise<ObjetoResponseDto> {
     if (dto.pertencePatrimonio === true) {
       throw new BadRequestException('Proibido: Não é permitido descartar equipamentos que pertencem ao patrimônio do IFPE.');
     }
-    const objeto = await this.objetos.save(this.objetos.create(dto));
-    return this.toResponse(objeto);
+
+    // Separamos a criação da instância do salvamento para o TypeScript inferir corretamente
+    const novoObjeto = this.objetos.create(dto);
+    const objetoSalvo = await this.objetos.save(novoObjeto);
+
+    return this.toResponse(objetoSalvo);
   }
 
   async findAll(query: ListObjetosQueryDto) {

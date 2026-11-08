@@ -1,16 +1,16 @@
-import { faker } from '@faker-js/faker/locale/pt_BR';
-import dataSource from './data-source'; // Verifique se o caminho do seu data-source.ts está correto
+import { fakerPT_BR as faker } from '@faker-js/faker';
+import { AppDataSource } from './data-source'; // Verifique se o caminho do seu data-source.ts está correto
 import { Coletor } from './coletor/entities/coletor.entity';
 import { Objeto } from './objetos/entities/objeto.entity';
 
 async function semear() {
-  await dataSource.initialize();
+  await AppDataSource.initialize();
   console.log('Conectado ao banco. Populando dados do EcoCampusIFPE...');
 
   faker.seed(42);
 
   // 1. Criar Coletores (Lixeiras CINFRA)
-  const repoColetores = dataSource.getRepository(Coletor);
+  const repoColetores = AppDataSource.getRepository(Coletor);
   const coletores = await repoColetores.save(
     Array.from({ length: 10 }, () => ({
       localizacao: `Bloco ${faker.string.alpha({ casing: 'upper' })} - ${faker.location.buildingNumber()}`,
@@ -22,7 +22,7 @@ async function semear() {
   console.log(`✅ ${coletores.length} coletores criados.`);
 
   // 2. Criar Objetos
-  const repoObjetos = dataSource.getRepository(Objeto);
+  const repoObjetos = AppDataSource.getRepository(Objeto);
   const tiposObjeto = ['metal', 'plástico', 'vidro', 'papel', 'eletrônico'];
   
   const objetos = await repoObjetos.save(
@@ -38,7 +38,7 @@ async function semear() {
   console.log(`✅ ${objetos.length} objetos criados.`);
 
   console.log('🌱 Semeadura concluída com sucesso!');
-  await dataSource.destroy();
+  await AppDataSource.destroy();
 }
 
 semear().catch((erro) => {

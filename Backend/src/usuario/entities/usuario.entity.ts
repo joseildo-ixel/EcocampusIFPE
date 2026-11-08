@@ -13,19 +13,19 @@ export class Usuario {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   nome: string;
 
-  @Column({ unique: true, length: 255 })
+  @Column({ type: 'varchar', unique: true, length: 255 })
   email: string;
 
-  @Column({ length: 255, select: false })
+  @Column({ type: 'varchar', length: 255, select: false })
   senha: string;
 
   @Column({ type: 'enum', enum: UsuarioRole, enumName: 'usuarios_role_enum' })
   role: UsuarioRole;
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   ativo: boolean;
 
   @CreateDateColumn({ type: 'timestamp' })

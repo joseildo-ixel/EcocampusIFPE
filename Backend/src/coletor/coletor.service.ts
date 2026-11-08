@@ -6,6 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { createPageResponse } from '../common/dto/page-query.dto';
+import { DescarteStatus } from '../common/enums/descarte-status.enum';
 import { Descarte } from '../Descarte/entities/descarte.entity';
 import { ColetorResponseDto } from './dto/coletor-response.dto';
 import { CreateColetorDto } from './dto/create-coletor.dto';
@@ -137,7 +138,7 @@ export class ColetorService {
         .getRepository(Descarte)
         .createQueryBuilder()
         .update()
-        .set({ status: 'finalizado' })
+        .set({ status: DescarteStatus.FINALIZADO })
         .where('"coletorId" = :id', { id })
         .andWhere('"status" != :status', { status: 'finalizado' })
         .execute();
