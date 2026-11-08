@@ -279,4 +279,17 @@ export class DescarteService {
       })),
     };
   }
+  async gerarRelatorioCompleto(): Promise<Descarte[]> {
+    return await this.descartes
+      .createQueryBuilder('descarte')
+      // Traz os itens do descarte e os detalhes físicos dos objetos
+      .leftJoinAndSelect('descarte.itens', 'item')
+      .leftJoinAndSelect('item.objeto', 'objeto')
+      // Traz os dados do usuário que fez o descarte
+      .leftJoinAndSelect('descarte.usuario', 'usuario')
+      // Traz os dados do coletor que recebeu o descarte
+      .leftJoinAndSelect('descarte.coletor', 'coletor')
+      .orderBy('descarte.dataCriacao', 'DESC')
+      .getMany();
+  }
 }
