@@ -12,7 +12,7 @@ export class Coletor {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   localizacao: string;
 
   @Column({ type: 'decimal', precision: 5, scale: 2 })
@@ -21,7 +21,7 @@ export class Coletor {
   @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
   volumeAtual: number;
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   ativo: boolean;
 
   @CreateDateColumn({ type: 'timestamp' })

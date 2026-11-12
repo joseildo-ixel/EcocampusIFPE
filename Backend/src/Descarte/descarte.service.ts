@@ -17,6 +17,7 @@ import { DescarteResponseDto } from './dto/descarte-response.dto';
 import { ListDescartesQueryDto } from './dto/list-descartes-query.dto';
 import { UpdateDescarteDto } from './dto/update-descarte.dto';
 import { Descarte } from './entities/descarte.entity';
+import { DescarteStatus } from '../common/enums/descarte-status.enum';
 
 @Injectable()
 export class DescarteService {
@@ -33,7 +34,7 @@ export class DescarteService {
         const usuarios = manager.getRepository(Usuario);
         const coletores = manager.getRepository(Coletor);
         const objetos = manager.getRepository(Objeto);
-        const descartes = manager.getRepository(Descarte);
+        const descartesRepo = manager.getRepository(Descarte);
         const itens = manager.getRepository(DescarteItem);
 
         const usuario = await usuarios.findOneBy({ id: dto.usuarioId });
@@ -82,26 +83,26 @@ export class DescarteService {
           objectsById.set(objetoId, objeto);
         }
 
-        const descarte = await descartes.save(
-          descartes.create({
-            status: dto.status ?? 'pendente',
-            dataDescarte: dto.dataDescarte
-              ? new Date(dto.dataDescarte)
-              : new Date(),
-            pesoKg: dto.pesoKg,
-            tipoResiduo: dto.tipoResiduo,
-            destino: dto.destino,
-            observacoes: dto.observacoes ?? null,
-            usuarioId: dto.usuarioId,
-            coletorId: dto.coletorId,
-          }),
-        );
+        const novoDescarte = descartesRepo.create({
+          status: dto.status ?? DescarteStatus.PENDENTE,
+          dataDescarte: dto.dataDescarte
+            ? new Date(dto.dataDescarte)
+            : new Date(),
+          pesoKg: dto.pesoKg,
+          tipoResiduo: dto.tipoResiduo,
+          destino: dto.destino,
+          observacoes: dto.observacoes ?? null,
+          usuarioId: dto.usuarioId,
+          coletorId: dto.coletorId,
+        });
+
+        const descarteSalvo = await descartesRepo.save(novoDescarte);
 
         if (dto.itens?.length) {
           await itens.save(
             dto.itens.map((item) =>
               itens.create({
-                descarteId: descarte.id,
+                descarteId: descarteSalvo.id,
                 objetoId: item.objetoId,
                 quantidade: item.quantidade,
                 objeto: objectsById.get(item.objetoId),
@@ -112,7 +113,8 @@ export class DescarteService {
 
         coletor.volumeAtual = Number((volumeAtual + dto.pesoKg).toFixed(2));
         await coletores.save(coletor);
-        return descarte.id;
+
+        return descarteSalvo.id;
       });
     } catch (error) {
       if (isUniqueConstraintViolation(error)) {
@@ -276,5 +278,18 @@ export class DescarteService {
         },
       })),
     };
+  }
+  async gerarRelatorioCompleto(): Promise<Descarte[]> {
+    return await this.descartes
+      .createQueryBuilder('descarte')
+      // Traz os itens do descarte e os detalhes físicos dos objetos
+      .leftJoinAndSelect('descarte.itens', 'item')
+      .leftJoinAndSelect('item.objeto', 'objeto')
+      // Traz os dados do usuário que fez o descarte
+      .leftJoinAndSelect('descarte.usuario', 'usuario')
+      // Traz os dados do coletor que recebeu o descarte
+      .leftJoinAndSelect('descarte.coletor', 'coletor')
+      .orderBy('descarte.dataCriacao', 'DESC')
+      .getMany();
   }
 }

@@ -7,12 +7,13 @@ import { CompleteDomainSchema1000000000001 } from '../migrations/1000000000001-C
 import { CreateTables1000000000000 } from '../migrations/1000000000000-CreateTables';
 import { PreserveDisposalHistory1000000000002 } from '../migrations/1000000000002-PreserveDisposalHistory';
 import { UserAndDatabaseConstraints1000000000003 } from '../migrations/1000000000003-UserAndDatabaseConstraints';
+import { AddObjectAssetFlag1000000000004 } from '../migrations/1000000000004-AddObjectAssetFlag';
 import { Usuario } from '../usuario/entities/usuario.entity';
 
 export const databaseConfig: TypeOrmModuleOptions = {
   type: 'postgres',
   host: process.env.DB_HOST || '127.0.0.1',
-  port: Number(process.env.DB_PORT || 5432),
+  port: Number(process.env.DB_PORT || 5433),
   username: process.env.DB_USERNAME || 'postgres',
   password: process.env.DB_PASSWORD || 'senha123',
   database: process.env.DB_NAME || 'ecocampus',
@@ -22,6 +23,7 @@ export const databaseConfig: TypeOrmModuleOptions = {
     CompleteDomainSchema1000000000001,
     PreserveDisposalHistory1000000000002,
     UserAndDatabaseConstraints1000000000003,
+    AddObjectAssetFlag1000000000004,
   ],
   migrationsRun: true,
   synchronize: false,

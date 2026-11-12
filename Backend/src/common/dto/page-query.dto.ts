@@ -35,10 +35,10 @@ export function createPageResponse<T>(
   return {
     data,
     meta: {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
+      page: Number(page),
+      limit: Number(limit),
+      total: Number(total),
+      totalPages: Math.ceil(Number(total) / Number(limit)),
     },
   };
 }
