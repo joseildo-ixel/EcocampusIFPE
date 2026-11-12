@@ -30,10 +30,10 @@ export class Descarte {
   @Column({ type: 'decimal', precision: 5, scale: 2 })
   pesoKg: number;
 
-  @Column({ length: 50 })
+  @Column({ type: 'varchar', length: 50 })
   tipoResiduo: string; // 'eletrônico', 'perigoso', 'comum'
 
-  @Column({ length: 100 })
+  @Column({ type: 'varchar', length: 100 })
   destino: string; // Para onde foi o resíduo
 
   @Column({ type: 'text', nullable: true })
