@@ -28,6 +28,11 @@ export class DescarteController {
     return this.descarteService.findAll(query);
   }
 
+  @Get('relatorio/completo')
+  gerarRelatorioCompleto() {
+    return this.descarteService.gerarRelatorioCompleto();
+  }
+  
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.descarteService.findOne(id);

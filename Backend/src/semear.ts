@@ -19,7 +19,7 @@ async function semear() {
       ativo: true,
     }))
   );
-  console.log(`✅ ${coletores.length} coletores criados.`);
+  console.log(`${coletores.length} coletores criados.`);
 
   // 2. Criar Objetos
   const repoObjetos = AppDataSource.getRepository(Objeto);
@@ -35,8 +35,10 @@ async function semear() {
       pertencePatrimonio: faker.datatype.boolean(0.2), // 20% de chance de ser patrimônio
     }))
   );
-  console.log(`✅ ${objetos.length} objetos criados.`);
+  console.log(`${objetos.length} objetos criados.`);
 
+  console.log('Semeadura concluída com sucesso!');
+  await dataSource.destroy();
   console.log('🌱 Semeadura concluída com sucesso!');
   await AppDataSource.destroy();
 }
