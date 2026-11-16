@@ -17,6 +17,7 @@ describe('EcoCampus API (PostgreSQL)', () => {
     coletor?: string;
     objeto?: string;
     descarte?: string;
+    activeDisposal?: string;
     archiveCollector?: string;
     archiveDisposal?: string;
   } = {};
@@ -56,6 +57,9 @@ describe('EcoCampus API (PostgreSQL)', () => {
       const dataSource = app.get(DataSource);
       if (ids.descarte) {
         await dataSource.getRepository(Descarte).delete(ids.descarte);
+      }
+      if (ids.activeDisposal) {
+        await dataSource.getRepository(Descarte).delete(ids.activeDisposal);
       }
       if (ids.archiveDisposal) {
         await dataSource.getRepository(Descarte).delete(ids.archiveDisposal);
@@ -139,6 +143,42 @@ describe('EcoCampus API (PostgreSQL)', () => {
     }>('/api/coletor?localizacao=Bloco');
     expect(collectorList.body.data.map(({ id }) => id)).toContain(ids.coletor);
 
+    const inactiveCollector = await request<{ id: string }>(
+      '/api/coletor',
+      'POST',
+      {
+        localizacao: 'Coletor inativo - teste',
+        capacidadeMaxima: 10,
+        ativo: false,
+      },
+    );
+    expect(inactiveCollector.status).toBe(201);
+
+    const disposalWithInactiveCollector = await request(
+      '/descarte',
+      'POST',
+      {
+        tipoResiduo: 'eletrônico',
+        pesoKg: 1,
+        destino: 'Triagem',
+        usuarioId: ids.usuario,
+        coletorId: inactiveCollector.body.id,
+      },
+    );
+    expect(disposalWithInactiveCollector.status).toBe(400);
+
+    expect(
+      (await request<{ volumeAtual: number }>(
+        `/api/coletor/${inactiveCollector.body.id}`,
+      )).body.volumeAtual,
+    ).toBe(0);
+
+    expect(
+      (await request(
+        `/api/coletor/${inactiveCollector.body.id}`,
+        'DELETE',
+      )).status,
+    ).toBe(200);
     const createdObject = await request<{ id: string }>(
       '/objetos',
       'POST',
@@ -151,6 +191,39 @@ describe('EcoCampus API (PostgreSQL)', () => {
     );
     expect(createdObject.status).toBe(201);
     ids.objeto = createdObject.body.id;
+
+    const inactiveObject = await request<{ id: string }>(
+      '/objetos',
+      'POST',
+      {
+        nome: 'Componente inativo - teste',
+        descricao: 'Objeto usado para testar validação',
+        tipo: 'eletrônico',
+        pesoKg: 1,
+        ativo: false,
+      },
+    );
+    expect(inactiveObject.status).toBe(201);
+
+    const disposalWithInactiveObject = await request(
+      '/descarte',
+      'POST',
+      {
+        tipoResiduo: 'eletrônico',
+        pesoKg: 1,
+        destino: 'Triagem',
+        usuarioId: ids.usuario,
+        coletorId: ids.coletor,
+        itens: [{ objetoId: inactiveObject.body.id, quantidade: 1 }],
+      },
+    );
+    expect(disposalWithInactiveObject.status).toBe(400);
+
+    const collectorAfterInactiveObject = await request<{
+      volumeAtual: number;
+    }>(`/api/coletor/${ids.coletor}`);
+
+    expect(collectorAfterInactiveObject.body.volumeAtual).toBe(0);
 
     const objectList = await request<{
       data: Array<{ id: string; pesoKg: number }>;
@@ -169,6 +242,29 @@ describe('EcoCampus API (PostgreSQL)', () => {
       coletorId: ids.coletor,
     });
     expect(missingUserDisposal.status).toBe(404);
+
+    const disposalWithDuplicateObjects = await request(
+      '/descarte',
+      'POST',
+      {
+        tipoResiduo: 'eletrônico',
+        pesoKg: 2,
+        destino: 'Triagem',
+        usuarioId: ids.usuario,
+        coletorId: ids.coletor,
+        itens: [
+          { objetoId: ids.objeto, quantidade: 1 },
+          { objetoId: ids.objeto, quantidade: 1 },
+        ],
+      },
+    );
+    expect(disposalWithDuplicateObjects.status).toBe(400);
+
+    const collectorAfterDuplicateObjects = await request<{
+      volumeAtual: number;
+    }>(`/api/coletor/${ids.coletor}`);
+
+    expect(collectorAfterDuplicateObjects.body.volumeAtual).toBe(0);
 
     const createdDisposal = await request<{
       id: string;
@@ -241,6 +337,25 @@ describe('EcoCampus API (PostgreSQL)', () => {
     );
     expect(capacityExceeded.status).toBe(400);
 
+    const disposalWeightExceeded = await request(
+      `/descarte/${ids.descarte}`,
+      'PATCH',
+      { pesoKg: 11 },
+    );
+    expect(disposalWeightExceeded.status).toBe(400);
+
+    const disposalAfterRejectedUpdate = await request<{
+      pesoKg: number;
+    }>(`/descarte/${ids.descarte}`);
+
+    expect(disposalAfterRejectedUpdate.body.pesoKg).toBe(2);
+
+    const collectorAfterRejectedUpdate = await request<{
+      volumeAtual: number;
+    }>(`/api/coletor/${ids.coletor}`);
+
+    expect(collectorAfterRejectedUpdate.body.volumeAtual).toBe(2);
+
     const updatedDisposal = await request<{ status: string; pesoKg: number }>(
       `/descarte/${ids.descarte}`,
       'PATCH',
@@ -249,6 +364,38 @@ describe('EcoCampus API (PostgreSQL)', () => {
     expect(updatedDisposal.status).toBe(200);
     expect(updatedDisposal.body.status).toBe('processado');
     expect(updatedDisposal.body.pesoKg).toBe(3);
+
+    const activeDisposal = await request<{ id: string }>(
+      '/descarte',
+      'POST',
+      {
+        tipoResiduo: 'eletrônico',
+        pesoKg: 1,
+        destino: 'Triagem',
+        usuarioId: ids.usuario,
+        coletorId: ids.coletor,
+      },
+    );
+    expect(activeDisposal.status).toBe(201);
+    ids.activeDisposal = activeDisposal.body.id;
+
+    const collectorBeforeActiveDisposalDelete = await request<{
+      volumeAtual: number;
+    }>(`/api/coletor/${ids.coletor}`);
+
+    expect(collectorBeforeActiveDisposalDelete.body.volumeAtual).toBe(4);
+
+    const deletedActiveDisposal = await request(
+      `/descarte/${ids.activeDisposal}`,
+      'DELETE',
+    );
+    expect(deletedActiveDisposal.status).toBe(200);
+
+    const collectorAfterActiveDisposalDelete = await request<{
+      volumeAtual: number;
+    }>(`/api/coletor/${ids.coletor}`);
+
+    expect(collectorAfterActiveDisposalDelete.body.volumeAtual).toBe(3);
 
     const objectInUse = await request(`/objetos/${ids.objeto}`, 'DELETE');
     expect(objectInUse.status).toBe(409);
